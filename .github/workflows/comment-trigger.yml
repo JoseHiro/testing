@@ -1,0 +1,36 @@
+name: Trigger Link Search
+on:
+  pull_request:
+    types: [opened, synchronize]
+                    # edited
+
+jobs:
+  find_notion_link:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with: 
+          python-version: '3.x'
+      
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Find Notion link from the description
+        id: find_link
+        run: |
+          pr_body="${{ github.event.pull_request.body }}"
+          notion_link=$(echo "$pr_body" | grep -oE 'https?://www\.notion\.so/\S+')
+          echo "Notion link found: $notion_link"
+          echo "LINK=$notion_link" >> $GITHUB_ENV 
+
+      - name: Output Notion link if found
+        if: ${{ env.LINK != '' }}
+        run: |
+          echo "Found Notion link: $LINK"
