@@ -32,4 +32,5 @@ jobs:
 
       - name: Output Notion link if found
         if: ${{ env.LINK != '' }}
-        run: echo "Found Notion link: $LINK"
+        run: |
+          echo "Found Notion link: $LINK"
